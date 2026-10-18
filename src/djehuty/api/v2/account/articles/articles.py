@@ -12,6 +12,7 @@ from djehuty.api.dependencies import (
 )
 from djehuty.api.exceptions import ForbiddenError, InvalidInputError, NotFoundError
 from djehuty.api.models.common import ErrorResponse
+from djehuty.api.permissions import enforce_collaborative_permissions
 from djehuty.api.services.article_service import ArticleService
 from djehuty.api.services.request_lists import (
     author_list_from_request_input,
@@ -389,6 +390,7 @@ def delete_article(
 ):
     try:
         dataset = _resolve_private_dataset(db, dataset_id, account["uuid"])
+        enforce_collaborative_permissions(db, account["uuid"], dataset, "dataset", "metadata_remove")
         if db.soft_delete_dataset_draft(
             dataset["container_uuid"], dataset["uuid"], account["uuid"], dataset["account_uuid"]
         ):
